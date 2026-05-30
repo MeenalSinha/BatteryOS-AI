@@ -1,0 +1,84 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "annotations": { "list": [] },
+  "description": "BatteryOS AI — System & Battery Metrics",
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 1,
+  "id": null,
+  "panels": [
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "thresholds" }, "unit": "s",
+          "thresholds": { "steps": [{ "color": "green", "value": null }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "id": 1,
+      "options": { "reduceOptions": { "calcs": ["last"] }, "orientation": "auto", "textMode": "auto", "colorMode": "background" },
+      "title": "Uptime",
+      "type": "stat",
+      "targets": [{ "expr": "batteryos_uptime_seconds", "refId": "A" }]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": { "defaults": { "unit": "percent", "max": 100,
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 70 },
+            { "color": "red", "value": 90 }
+          ]}
+      }},
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "id": 2,
+      "options": { "reduceOptions": { "calcs": ["last"] }, "orientation": "auto" },
+      "title": "CPU Usage",
+      "type": "gauge",
+      "targets": [{ "expr": "batteryos_cpu_usage_percent", "refId": "A" }]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": { "defaults": { "unit": "short",
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "red", "value": 1 }
+          ]}
+      }},
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "id": 3,
+      "title": "Critical Alerts",
+      "type": "stat",
+      "targets": [{ "expr": "batteryos_critical_alerts", "refId": "A" }]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": { "defaults": { "unit": "short" } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "id": 4,
+      "title": "Total Alerts Over Time",
+      "type": "timeseries",
+      "targets": [{ "expr": "batteryos_total_alerts", "legendFormat": "Total Alerts", "refId": "A" }]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": { "defaults": { "unit": "percent" } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "id": 5,
+      "title": "CPU & Memory Usage",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "batteryos_cpu_usage_percent",    "legendFormat": "CPU %",    "refId": "A" },
+        { "expr": "batteryos_memory_usage_percent", "legendFormat": "Memory %", "refId": "B" }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": ["batteryos", "ev", "battery"],
+  "title": "BatteryOS AI Dashboard",
+  "uid": "batteryos-main",
+  "version": 1
+}
