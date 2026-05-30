@@ -77,14 +77,14 @@ class SlidingWindowCounter:
         return True, remaining - 1
 
 
-_limiter = SlidingWindowCounter(max_requests=200, window_seconds=60)
-_ws_limiter = SlidingWindowCounter(max_requests=20, window_seconds=60)
+_limiter = SlidingWindowCounter(max_requests=1000, window_seconds=60)
+_ws_limiter = SlidingWindowCounter(max_requests=100, window_seconds=60)
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """
     Rate limiting middleware:
-      - 200 requests/min per IP for REST endpoints
+      - 1000 requests/min per IP for REST endpoints
       - WebSocket connections tracked separately
       - /health and /docs excluded
     """
@@ -110,7 +110,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                 status_code=429,
                 content={
                     "error": "Rate limit exceeded",
-                    "detail": "Too many requests. Limit: 200/minute.",
+                    "detail": "Too many requests. Limit: 1000/minute.",
                     "retry_after": 60,
                 },
                 headers={"Retry-After": "60"},
