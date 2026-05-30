@@ -14,23 +14,23 @@ export default function VoiceAssistant() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
-  const [hasAlerted, setHasAlerted] = useState(false);
+  const hasAlertedRef = useRef(false);
   const endRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const { latestTelemetry, activeScenario, activeVehicleId } = useBatteryStore();
 
   useEffect(() => {
-    if (latestTelemetry && latestTelemetry.thermal_risk_score > 0.8 && !hasAlerted) {
+    if (latestTelemetry && latestTelemetry.thermal_risk_score > 0.8 && !hasAlertedRef.current) {
       setOpen(true);
       setMessages(prev => [
         ...prev,
         { role: "assistant", content: "CRITICAL ALERT: Thermal risk exceeds 80%. Immediate cooling intervention recommended.", timestamp: new Date().toLocaleTimeString() }
       ]);
-      setHasAlerted(true);
+      hasAlertedRef.current = true;
     } else if (latestTelemetry && latestTelemetry.thermal_risk_score < 0.5) {
-      setHasAlerted(false);
+      hasAlertedRef.current = false;
     }
-  }, [latestTelemetry, hasAlerted]);
+  }, [latestTelemetry]);
 
   const buildContext = useCallback((userMsg: string) => {
     const t = latestTelemetry;
