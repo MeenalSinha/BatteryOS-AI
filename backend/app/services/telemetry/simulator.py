@@ -5,7 +5,6 @@ Generates realistic battery telemetry for demo/development purposes.
 import random
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
-import uuid
 
 
 SCENARIOS = {
