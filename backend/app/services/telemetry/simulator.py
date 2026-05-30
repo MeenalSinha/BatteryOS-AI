@@ -47,14 +47,31 @@ SCENARIOS = {
 }
 
 
+_simulators = {}
+
+
 class TelemetrySimulator:
+    def __new__(cls, vehicle_id: str = None, scenario: str = "healthy", *args, **kwargs):
+        vid = vehicle_id or "unknown"
+        key = f"{vid}_{scenario}"
+        if key not in _simulators:
+            instance = super().__new__(cls)
+            instance._initialized = False
+            _simulators[key] = instance
+        return _simulators[key]
+
     def __init__(self, vehicle_id: str = None, scenario: str = "healthy",
                  chemistry: str = "NMC", capacity_kwh: float = 75.0):
-        self.vehicle_id = vehicle_id or str(uuid.uuid4())
+        if getattr(self, "_initialized", False):
+            return
+
+        self.vehicle_id = vehicle_id or "unknown"
         self.scenario = SCENARIOS.get(scenario, SCENARIOS["healthy"])
         self.scenario_name = scenario
         self.chemistry = chemistry
         self.capacity_kwh = capacity_kwh
+
+        self._initialized = True
 
         # Mutable state
         self.soc = random.uniform(*self.scenario["soc_range"])
