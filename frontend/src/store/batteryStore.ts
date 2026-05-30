@@ -108,7 +108,7 @@ export const useBatteryStore = create<BatteryStore>()(
         alerts: [
           {
             ...alert,
-            id: `alert_${Date.now()}`,
+            id: `alert_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
             timestamp: new Date().toISOString(),
           },
           ...s.alerts.slice(0, 49),
