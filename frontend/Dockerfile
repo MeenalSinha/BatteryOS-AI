@@ -3,13 +3,16 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci --legacy-peer-deps
 COPY . .
+# Ensure public/ exists so the build never fails on an empty directory
+RUN mkdir -p public
 RUN npm run build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
-ENV NODE_ENV production
+ENV NODE_ENV=production
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+# public/ is empty — create it so Next.js standalone server is happy
+RUN mkdir -p ./public
 EXPOSE 3000
 CMD ["node", "server.js"]
