@@ -6,7 +6,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from app.core.websocket_manager import ws_manager
 from app.core.notification_engine import notification_engine
 from app.core.influx_writer import write_telemetry
-from app.core.cache import cache_set, cache_get
+from app.core.cache import cache_set
 from app.services.telemetry.simulator import TelemetrySimulator
 from app.services.ai.anomaly_detector import anomaly_detector
 

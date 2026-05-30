@@ -10,11 +10,11 @@ from typing import Callable
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-from jose import jwt, JWTError
 
 logger = logging.getLogger(__name__)
 
 # ─── Security: JWT Authentication Middleware ─────────────────────────────────
+
 
 class JWTAuthMiddleware(BaseHTTPMiddleware):
     """Enforces JWT Bearer token authentication on all API and WS endpoints."""
@@ -24,22 +24,22 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
         path = request.url.path
         if path in self.EXCLUDED_PATHS or path.startswith("/docs") or path.startswith("/openapi"):
             return await call_next(request)
-            
+
         token = request.headers.get("Authorization")
-        
+
         # WebSockets can pass token via query params
         if path.startswith("/ws"):
             query_token = request.query_params.get("token")
             if query_token:
                 token = f"Bearer {query_token}"
-                
+
         if not token or not token.startswith("Bearer "):
             logger.warning(f"Unauthorized access attempt to {path}")
             return JSONResponse(
                 status_code=401,
                 content={"error": "Unauthorized", "detail": "Valid JWT Bearer token required."}
             )
-            
+
         # In a real system, we'd verify the signature here using python-jose.
         # For the prototype, we verify it has the correct structure.
         raw_token = token.split(" ")[1]
@@ -48,12 +48,13 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
                 status_code=401,
                 content={"error": "Invalid Token", "detail": "Malformed JWT structure."}
             )
-            
+
         # Add the decoded user identity to request state
         request.state.user = {"sub": "demo_user", "role": "admin"}
         return await call_next(request)
 
-# ─── In-memory sliding window rate limiter ───────────────────────────────────
+
+# ─── In-memory sliding window rate limiter ────────────────────────────────────────
 
 class SlidingWindowCounter:
     """Thread-safe sliding window rate limiter (in-memory fallback)."""
@@ -98,7 +99,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         # Get client identifier (IP + optional API key hash)
         client_ip = request.client.host if request.client else "unknown"
-        api_key   = request.headers.get("X-API-Key", "")
+        api_key = request.headers.get("X-API-Key", "")
         client_id = hashlib.md5(f"{client_ip}:{api_key}".encode()).hexdigest()[:16]
 
         allowed, remaining = _limiter.is_allowed(client_id)
@@ -118,12 +119,12 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
 
         # Add security + rate-limit headers
-        response.headers["X-RateLimit-Limit"]     = "200"
+        response.headers["X-RateLimit-Limit"] = "200"
         response.headers["X-RateLimit-Remaining"] = str(remaining)
         response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"]        = "DENY"
-        response.headers["X-XSS-Protection"]       = "1; mode=block"
-        response.headers["Referrer-Policy"]         = "strict-origin-when-cross-origin"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
         return response
 

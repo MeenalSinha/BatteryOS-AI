@@ -1,6 +1,5 @@
 """Digital Twin simulation endpoints."""
 from fastapi import APIRouter, Query
-from typing import Optional
 from app.services.digital_twin.battery_twin import digital_twin_engine
 
 router = APIRouter()
@@ -8,7 +7,7 @@ router = APIRouter()
 
 @router.post("/create/{twin_id}")
 async def create_twin(twin_id: str, chemistry: str = Query("NMC"),
-                       capacity_kwh: float = Query(75.0)):
+                      capacity_kwh: float = Query(75.0)):
     digital_twin_engine.create_twin(twin_id, chemistry=chemistry, capacity_kwh=capacity_kwh)
     return {"twin_id": twin_id, "status": "created", "chemistry": chemistry}
 

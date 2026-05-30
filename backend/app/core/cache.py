@@ -12,10 +12,10 @@ _redis_unavailable = False
 async def get_redis():
     """Lazy-init Redis client."""
     global _redis_client, _redis_unavailable
-    
+
     if _redis_unavailable:
         return None
-        
+
     if _redis_client is None:
         try:
             import redis.asyncio as aioredis

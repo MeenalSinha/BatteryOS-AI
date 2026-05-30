@@ -1,6 +1,5 @@
 """WebSocket connection manager for live telemetry streaming."""
 import json
-import asyncio
 import logging
 from typing import Dict, Set
 from fastapi import WebSocket

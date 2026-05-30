@@ -5,7 +5,6 @@ Integrates with WebSocket manager for live push notifications.
 """
 import uuid
 import logging
-import asyncio
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass, field, asdict
@@ -237,7 +236,7 @@ class NotificationEngine:
             })
 
     def get_recent_alerts(self, vehicle_id: Optional[str] = None,
-                           limit: int = 50) -> List[Dict[str, Any]]:
+                          limit: int = 50) -> List[Dict[str, Any]]:
         """Retrieve recent notifications, optionally filtered by vehicle."""
         alerts = self._notification_history
         if vehicle_id:

@@ -67,7 +67,7 @@ ANOMALY_FEATURE_META = {
 
 
 def _permutation_importance(model, X: np.ndarray, y: np.ndarray,
-                             n_repeats: int = 10) -> np.ndarray:
+                            n_repeats: int = 10) -> np.ndarray:
     """Compute permutation importance for any sklearn-compatible model."""
     baseline = np.mean((model.predict(X) - y) ** 2)
     importances = np.zeros(X.shape[1])
@@ -180,7 +180,7 @@ def explain_degradation_prediction(model, features: Dict[str, Any]) -> Dict[str,
 
 
 def explain_anomaly_score(anomaly_score: float, features: Dict[str, Any],
-                           rules_triggered: List[str]) -> Dict[str, Any]:
+                          rules_triggered: List[str]) -> Dict[str, Any]:
     """
     Generate human-readable explanation for an anomaly detection result.
     Uses rule attribution directly from the triggered rules.
@@ -216,7 +216,6 @@ def explain_anomaly_score(anomaly_score: float, features: Dict[str, Any],
 
     # Add statistical features if no specific rules
     if not explanations:
-        temp = features.get("temperature_avg", 25)
         curr = abs(features.get("current", 0))
         if curr > 100:
             explanations.append({

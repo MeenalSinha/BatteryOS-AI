@@ -37,9 +37,9 @@ class BatteryCell:
         where T_ss = T_amb + Q_joule * R_th,  tau = R_th * C_th
         """
         Q_joule = (current_a ** 2) * self.internal_resistance   # W
-        T_ss    = ambient_temp + Q_joule * self.R_th             # steady-state
-        tau     = self.R_th * self.C_th                          # 22.5s
-        alpha   = math.exp(-dt_s / tau)
+        T_ss = ambient_temp + Q_joule * self.R_th             # steady-state
+        tau = self.R_th * self.C_th                          # 22.5s
+        alpha = math.exp(-dt_s / tau)
         self.temperature = T_ss + (self.temperature - T_ss) * alpha
         self.temperature = max(-20.0, min(200.0, self.temperature))
 
@@ -48,12 +48,12 @@ class BatteryCell:
         self.voltage = max(2.5, min(4.25, self.voltage - dv))
 
         # SEI degradation (Arrhenius-scaled, per Ah throughput)
-        T_k   = self.temperature + 273.15
-        Ea    = 0.60   # eV
+        T_k = self.temperature + 273.15
+        Ea = 0.60   # eV
         R_gas = 8.314
-        Tr    = 298.15
-        arr   = math.exp(Ea * (1 / Tr - 1 / T_k) * 1000 / R_gas)
-        deg   = 1e-5 * abs(current_a) * (dt_s / 3600) * arr
+        Tr = 298.15
+        arr = math.exp(Ea * (1 / Tr - 1 / T_k) * 1000 / R_gas)
+        deg = 1e-5 * abs(current_a) * (dt_s / 3600) * arr
         self.soh = max(0.5, self.soh - deg)
 
 
@@ -87,24 +87,24 @@ class BatteryPack:
 
     def get_state(self) -> Dict[str, Any]:
         voltages = [c.voltage for c in self.cells]
-        temps    = [c.temperature for c in self.cells]
-        sohs     = [c.soh for c in self.cells]
+        temps = [c.temperature for c in self.cells]
+        sohs = [c.soh for c in self.cells]
         n = len(self.cells)
         avg_v = sum(voltages) / n
 
         return {
-            "pack_voltage":       round(avg_v * self.num_cells / 10, 2),
-            "avg_cell_voltage":   round(avg_v, 4),
-            "max_cell_voltage":   round(max(voltages), 4),
-            "min_cell_voltage":   round(min(voltages), 4),
+            "pack_voltage": round(avg_v * self.num_cells / 10, 2),
+            "avg_cell_voltage": round(avg_v, 4),
+            "max_cell_voltage": round(max(voltages), 4),
+            "min_cell_voltage": round(min(voltages), 4),
             "cell_voltage_delta": round(max(voltages) - min(voltages), 4),
-            "avg_temperature":    round(sum(temps) / n, 2),
-            "max_temperature":    round(max(temps), 2),
-            "min_temperature":    round(min(temps), 2),
-            "avg_soh":            round(sum(sohs) / n * 100, 2),
-            "min_soh":            round(min(sohs) * 100, 2),
-            "cell_voltages":      [round(v, 4) for v in voltages],
-            "cell_temperatures":  [round(t, 2) for t in temps],
+            "avg_temperature": round(sum(temps) / n, 2),
+            "max_temperature": round(max(temps), 2),
+            "min_temperature": round(min(temps), 2),
+            "avg_soh": round(sum(sohs) / n * 100, 2),
+            "min_soh": round(min(sohs) * 100, 2),
+            "cell_voltages": [round(v, 4) for v in voltages],
+            "cell_temperatures": [round(t, 2) for t in temps],
         }
 
 
@@ -112,12 +112,12 @@ class DigitalTwinEngine:
     """Physics-accurate digital twin with analytical thermal stability."""
 
     SCENARIOS = {
-        "normal":         {"current_a": 50,   "ambient_temp": 25, "description": "Normal highway driving at 50A discharge"},
-        "fast_charge":    {"current_a": -180,  "ambient_temp": 30, "description": "DC fast charging at 180A"},
-        "aggressive":     {"current_a": 150,   "ambient_temp": 35, "description": "Aggressive acceleration at 150A"},
-        "cold_weather":   {"current_a": 40,    "ambient_temp": -10,"description": "Cold weather operation at −10°C"},
-        "thermal_stress": {"current_a": 180,   "ambient_temp": 50, "description": "Thermal stress: 180A at 50°C ambient"},
-        "cell_failure":   {"current_a": 80,    "ambient_temp": 30, "description": "Single cell failure (R×5) injection"},
+        "normal": {"current_a": 50, "ambient_temp": 25, "description": "Normal highway driving at 50A discharge"},
+        "fast_charge": {"current_a": -180, "ambient_temp": 30, "description": "DC fast charging at 180A"},
+        "aggressive": {"current_a": 150, "ambient_temp": 35, "description": "Aggressive acceleration at 150A"},
+        "cold_weather": {"current_a": 40, "ambient_temp": -10, "description": "Cold weather operation at −10°C"},
+        "thermal_stress": {"current_a": 180, "ambient_temp": 50, "description": "Thermal stress: 180A at 50°C ambient"},
+        "cell_failure": {"current_a": 80, "ambient_temp": 30, "description": "Single cell failure (R×5) injection"},
     }
 
     def __init__(self):
@@ -133,12 +133,12 @@ class DigitalTwinEngine:
         return twin_id
 
     def simulate_scenario(self, twin_id: str, scenario_name: str,
-                           steps: int = 60, dt_s: float = 60) -> Dict[str, Any]:
+                          steps: int = 60, dt_s: float = 60) -> Dict[str, Any]:
         if twin_id not in self.packs:
             self.create_twin(twin_id)
 
-        pack  = self.packs[twin_id]
-        scen  = self.SCENARIOS.get(scenario_name, self.SCENARIOS["normal"])
+        pack = self.packs[twin_id]
+        scen = self.SCENARIOS.get(scenario_name, self.SCENARIOS["normal"])
         pack.ambient_temp = scen["ambient_temp"]
 
         if scenario_name == "cell_failure":
@@ -152,33 +152,33 @@ class DigitalTwinEngine:
             pack.apply_current(current, dt_s)
             state = pack.get_state()
             state.update({
-                "step":      step,
-                "time_min":  round(step * dt_s / 60, 1),
-                "scenario":  scenario_name,
+                "step": step,
+                "time_min": round(step * dt_s / 60, 1),
+                "scenario": scenario_name,
                 "current_a": round(current, 1),
             })
             timeline.append(state)
 
-        t_start = timeline[0]["avg_temperature"]  if timeline else 0
-        t_end   = timeline[-1]["avg_temperature"] if timeline else 0
+        t_start = timeline[0]["avg_temperature"] if timeline else 0
+        t_end = timeline[-1]["avg_temperature"] if timeline else 0
 
         return {
-            "twin_id":           twin_id,
-            "scenario":          scenario_name,
-            "description":       scen["description"],
-            "steps":             steps,
-            "dt_seconds":        dt_s,
+            "twin_id": twin_id,
+            "scenario": scenario_name,
+            "description": scen["description"],
+            "steps": steps,
+            "dt_seconds": dt_s,
             "total_duration_min": round(steps * dt_s / 60, 1),
-            "timeline":          timeline,
-            "final_state":       timeline[-1] if timeline else {},
+            "timeline": timeline,
+            "final_state": timeline[-1] if timeline else {},
             "summary": {
-                "max_temperature":  max(s["max_temperature"]     for s in timeline),
-                "min_soh_reached":  min(s["min_soh"]             for s in timeline),
-                "max_cell_delta":   max(s["cell_voltage_delta"]  for s in timeline),
-                "thermal_events":   sum(1 for s in timeline if s["max_temperature"] > 45),
-                "start_temp":       round(t_start, 2),
-                "end_temp":         round(t_end,   2),
-                "temp_delta":       round(t_end - t_start, 2),
+                "max_temperature": max(s["max_temperature"] for s in timeline),
+                "min_soh_reached": min(s["min_soh"] for s in timeline),
+                "max_cell_delta": max(s["cell_voltage_delta"] for s in timeline),
+                "thermal_events": sum(1 for s in timeline if s["max_temperature"] > 45),
+                "start_temp": round(t_start, 2),
+                "end_temp": round(t_end, 2),
+                "temp_delta": round(t_end - t_start, 2),
             },
         }
 

@@ -50,7 +50,7 @@ class AnomalyDetector:
             logger.warning(f"Anomaly model load failed: {e}")
 
     def detect_cell_imbalance(self, cell_voltages: List[float],
-                               chemistry: str = "NMC") -> Dict[str, Any]:
+                              chemistry: str = "NMC") -> Dict[str, Any]:
         """Detect voltage imbalance across battery cells."""
         if not cell_voltages:
             return {"imbalance_detected": False, "delta_v": 0}
@@ -146,7 +146,7 @@ class AnomalyDetector:
         return "CRITICAL"
 
     def generate_failure_forecast(self, recent_telemetry: List[Dict],
-                                   vehicle_id: str) -> Dict[str, Any]:
+                                  vehicle_id: str) -> Dict[str, Any]:
         """Generate a 30-day failure probability forecast."""
         if not recent_telemetry:
             return {"forecast_available": False}

@@ -4,8 +4,7 @@ Predicts battery temperature trajectories and thermal runaway risk.
 """
 import math
 import logging
-import numpy as np
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +45,7 @@ class ThermalPredictor:
             logger.warning(f"Thermal model load failed: {e}")
 
     def _heat_generation(self, current_a: float, voltage_v: float,
-                          internal_resistance_ohm: float, soc: float) -> float:
+                         internal_resistance_ohm: float, soc: float) -> float:
         """Joule + entropic heat generation (W)."""
         joule = (current_a ** 2) * internal_resistance_ohm
         # Simplified entropic heat (negative during charge for NMC)
@@ -54,15 +53,15 @@ class ThermalPredictor:
         return joule + entropic
 
     def _lumped_thermal_step(self, T_cell: float, T_ambient: float,
-                              Q_gen: float, R_th: float, C_th: float,
-                              dt_s: float = 60) -> float:
+                             Q_gen: float, R_th: float, C_th: float,
+                             dt_s: float = 60) -> float:
         """Forward Euler step of lumped thermal model."""
         Q_cool = (T_cell - T_ambient) / R_th
         dT = (Q_gen - Q_cool) / C_th * dt_s
         return T_cell + dT
 
     def predict_temperature_profile(self, params: Dict[str, Any],
-                                     horizon_min: int = 60) -> List[Dict[str, Any]]:
+                                    horizon_min: int = 60) -> List[Dict[str, Any]]:
         """Predict cell temperature over next horizon_min minutes."""
         chemistry = params.get("chemistry", "NMC")
         T_cell = params.get("current_temp_c", 25.0)

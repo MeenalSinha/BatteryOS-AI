@@ -101,16 +101,15 @@ async def get_telemetry_history(
     Simulated historical telemetry — generates a realistic time-series
     for charting without requiring a running database.
     """
-    import math
     import random
     from datetime import datetime, timedelta, timezone
 
     random.seed(hash(vehicle_id) % 1000)
     base_configs = {
-        "healthy":           {"soh": 94, "temp": 27, "anomaly": 0.06},
-        "degraded":          {"soh": 73, "temp": 40, "anomaly": 0.42},
-        "thermal_runaway":   {"soh": 86, "temp": 72, "anomaly": 0.85},
-        "aggressive":        {"soh": 84, "temp": 50, "anomaly": 0.38},
+        "healthy": {"soh": 94, "temp": 27, "anomaly": 0.06},
+        "degraded": {"soh": 73, "temp": 40, "anomaly": 0.42},
+        "thermal_runaway": {"soh": 86, "temp": 72, "anomaly": 0.85},
+        "aggressive": {"soh": 84, "temp": 50, "anomaly": 0.38},
         "fast_charge_abuse": {"soh": 78, "temp": 56, "anomaly": 0.58},
     }
     cfg = base_configs.get(scenario, base_configs["healthy"])
@@ -123,7 +122,7 @@ async def get_telemetry_history(
         t = now - timedelta(seconds=(points - i) * 5)
         soc = max(5, min(100, soc + random.gauss(0, 0.8)))
         temp = max(cfg["temp"] - 8, min(cfg["temp"] + 15,
-                    temp + random.gauss(0, 0.6)))
+                                        temp + random.gauss(0, 0.6)))
         anomaly = max(0, min(1, cfg["anomaly"] + random.gauss(0, 0.05)))
         records.append({
             "timestamp": t.isoformat(),

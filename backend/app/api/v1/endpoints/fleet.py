@@ -63,7 +63,6 @@ async def compare_vehicles(
     from app.services.telemetry.simulator import TelemetrySimulator, SCENARIOS
     from app.services.ai.degradation_predictor import degradation_predictor
     from app.services.ai.anomaly_detector import anomaly_detector
-    import random
 
     ids = [v.strip() for v in vehicle_ids.split(",") if v.strip()][:10]
     scenarios = list(SCENARIOS.keys())

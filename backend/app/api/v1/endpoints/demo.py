@@ -1,6 +1,6 @@
 """Hackathon Demo Mode endpoints — preloaded scenarios for judges."""
 from fastapi import APIRouter
-from app.services.telemetry.simulator import TelemetrySimulator, get_fleet_snapshot
+from app.services.telemetry.simulator import TelemetrySimulator
 from app.services.ai.thermal_predictor import thermal_predictor
 from app.services.ai.degradation_predictor import degradation_predictor
 from app.services.ai.anomaly_detector import anomaly_detector

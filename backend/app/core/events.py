@@ -1,7 +1,5 @@
 """Application lifecycle events."""
 import logging
-from app.db.database import engine, Base
-from app.core.telemetry_subscriber import start_mqtt_subscriber
 
 logger = logging.getLogger(__name__)
 

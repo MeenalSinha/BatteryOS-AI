@@ -4,8 +4,7 @@ Generates battery-aware charging protocols that minimize degradation.
 """
 import math
 import logging
-import numpy as np
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
@@ -110,8 +109,8 @@ class ChargingOptimizer:
         }
 
     def _constant_rate_curve(self, soc_start: float, soc_end: float,
-                              current_a: float, capacity_ah: float,
-                              capped_at: float = None) -> Dict[str, Any]:
+                             current_a: float, capacity_ah: float,
+                             capped_at: float = None) -> Dict[str, Any]:
         if capped_at:
             current_a = min(current_a, capped_at)
         points = []
@@ -124,13 +123,13 @@ class ChargingOptimizer:
                 taper = 1 - (soc - self.TAPER_START * 100) / (
                     (self.TAPER_END - self.TAPER_START) * 100
                 )
-                I = current_a * max(0.1, taper)
+                current_step = current_a * max(0.1, taper)
             else:
-                I = current_a
-            dsoc = (I * dt / 60) / capacity_ah * 100
+                current_step = current_a
+            dsoc = (current_step * dt / 60) / capacity_ah * 100
             soc = min(soc + dsoc, soc_end)
             points.append({"time_min": time_min, "soc_pct": round(soc, 1),
-                           "current_a": round(I, 1), "power_kw": round(I * 400 / 1000, 2)})
+                           "current_a": round(current_step, 1), "power_kw": round(current_step * 400 / 1000, 2)})
             time_min += dt
             if time_min > 300:
                 break
@@ -144,8 +143,8 @@ class ChargingOptimizer:
         }
 
     def _ai_adaptive_curve(self, soc_start: float, soc_end: float,
-                            max_current_a: float, capacity_ah: float,
-                            soh: float) -> Dict[str, Any]:
+                           max_current_a: float, capacity_ah: float,
+                           soh: float) -> Dict[str, Any]:
         """Multi-stage adaptive charging with ramp-up and thermal-aware taper."""
         points = []
         soc = soc_start
@@ -156,25 +155,25 @@ class ChargingOptimizer:
         while soc < soc_end:
             # Stage 1: Ramp-up (avoid cold-start stress)
             if time_min < 5 and not warmup_done:
-                I = max_current_a * (time_min / 5)
+                current_step = max_current_a * (time_min / 5)
             elif soc < 40:
-                I = max_current_a
+                current_step = max_current_a
             elif soc < 70:
-                I = max_current_a * 0.95
+                current_step = max_current_a * 0.95
             elif soc < self.TAPER_START * 100:
                 # Gentle ramp down before CV
-                I = max_current_a * (1 - (soc - 70) / 30 * 0.3)
+                current_step = max_current_a * (1 - (soc - 70) / 30 * 0.3)
             else:
                 # CV phase — exponential taper
-                I = max_current_a * 0.7 * math.exp(
+                current_step = max_current_a * 0.7 * math.exp(
                     -3 * (soc - self.TAPER_START * 100) / 20
                 )
-                I = max(I, max_current_a * 0.05)
+                current_step = max(current_step, max_current_a * 0.05)
 
-            dsoc = (I * dt / 60) / capacity_ah * 100
+            dsoc = (current_step * dt / 60) / capacity_ah * 100
             soc = min(soc + dsoc, soc_end)
             points.append({"time_min": time_min, "soc_pct": round(soc, 1),
-                           "current_a": round(I, 1), "power_kw": round(I * 400 / 1000, 2)})
+                           "current_a": round(current_step, 1), "power_kw": round(current_step * 400 / 1000, 2)})
             time_min += dt
             if time_min > 300:
                 break

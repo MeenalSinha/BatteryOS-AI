@@ -16,10 +16,10 @@ async def system_metrics():
     """Detailed system + model health metrics."""
     import psutil
     try:
-        cpu  = psutil.cpu_percent(interval=0.1)
-        mem  = psutil.virtual_memory()
+        cpu = psutil.cpu_percent(interval=0.1)
+        mem = psutil.virtual_memory()
         disk = psutil.disk_usage("/")
-        mem_used_mb  = round(mem.used  / 1024**2, 1)
+        mem_used_mb = round(mem.used / 1024**2, 1)
         mem_total_mb = round(mem.total / 1024**2, 1)
         disk_used_gb = round(disk.used / 1024**3, 2)
     except Exception:

@@ -1,7 +1,7 @@
 """InfluxDB writer — persists telemetry time-series to InfluxDB bucket."""
 import logging
 from datetime import datetime, timezone
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -12,13 +12,13 @@ _influx_unavailable = False
 
 def get_influx_write_api():
     global _influx_client, _write_api, _influx_unavailable
-    
+
     if _influx_unavailable:
         return None
-        
+
     if _write_api is None:
         try:
-            from influxdb_client import InfluxDBClient, WriteOptions
+            from influxdb_client import InfluxDBClient
             from influxdb_client.client.write_api import ASYNCHRONOUS
             _influx_client = InfluxDBClient(
                 url=settings.INFLUX_URL,
@@ -37,7 +37,6 @@ def get_influx_write_api():
 def write_telemetry(telemetry: Dict[str, Any]) -> bool:
     """Write a single telemetry frame to InfluxDB."""
     try:
-        from influxdb_client.domain.write_precision import WritePrecision
         api = get_influx_write_api()
         if not api:
             return False

@@ -3,8 +3,6 @@ Synthetic Battery Telemetry Simulator
 Generates realistic battery telemetry for demo/development purposes.
 """
 import random
-import math
-import time
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 import uuid
@@ -91,16 +89,16 @@ class TelemetrySimulator:
         # Initialize velocity if missing
         if not hasattr(self, "temp_velocity"):
             self.temp_velocity = 0.0
-            
+
         # Smooth momentum for temperature (Ornstein-Uhlenbeck style)
         self.temp_velocity = self.temp_velocity * 0.85 + random.gauss(0, 0.15)
-        
+
         # If in thermal runaway, force temperature up
         if self.scenario_name == "thermal_runaway":
             self.temp_velocity += 0.4
-            
+
         self.temp += self.temp_velocity
-        
+
         temp_min, temp_max = self.scenario["temp_range"]
         self.temp = max(temp_min - 5, min(temp_max + 15, self.temp))
 
@@ -164,7 +162,7 @@ class TelemetrySimulator:
 
 
 def get_fleet_snapshot(num_vehicles: int = 10,
-                        scenarios: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+                       scenarios: Optional[List[str]] = None) -> List[Dict[str, Any]]:
     """Generate a snapshot of fleet telemetry."""
     if scenarios is None:
         scenarios = ["healthy"] * 6 + ["degraded"] * 2 + ["aggressive"] * 1 + ["thermal_runaway"] * 1

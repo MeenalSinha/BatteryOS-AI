@@ -1,7 +1,6 @@
 """Fleet Intelligence — Enterprise Battery Analytics Engine."""
 import random
 import statistics
-import uuid
 from typing import Dict, Any, List
 from datetime import datetime, timezone
 from app.services.telemetry.simulator import get_fleet_snapshot
@@ -10,14 +9,13 @@ from app.services.telemetry.simulator import get_fleet_snapshot
 class FleetAnalyticsEngine:
 
     def get_fleet_dashboard(self, fleet_id: str = "FLEET-001",
-                             num_vehicles: int = 10) -> Dict[str, Any]:
+                            num_vehicles: int = 10) -> Dict[str, Any]:
         """Generate comprehensive fleet analytics."""
         vehicles = get_fleet_snapshot(num_vehicles)
 
         sohs = [v["state_of_health"] for v in vehicles]
         temps = [v["temperature_avg"] for v in vehicles]
         anomalies = [v["anomaly_score"] for v in vehicles]
-        thermal_risks = [v["thermal_risk_score"] for v in vehicles]
 
         critical_vehicles = [
             v for v in vehicles
